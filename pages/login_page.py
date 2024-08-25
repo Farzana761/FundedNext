@@ -4,6 +4,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
+
 
 import time
 
@@ -15,7 +17,7 @@ class LoginPage:
         self.user_email_input = (By.XPATH, "//input[@id='basic_email']")
         self.user_password_input = (By.XPATH, "//input[@id='basic_password']")
         self.login_button = (By.XPATH, "//button[@id='login-btn-gtag']")
-        self.submit = (By.XPATH, "//span[contains(text(),'Submit')]")
+        self.submit = (By.XPATH, "//body[1]/main[1]/div[1]/div[1]/div[1]/div[1]/form[1]/div[2]/div[1]/div[1]/div[1]/div[1]/button[1]")
         self.dashboard = (By.XPATH, "//body/div[1]/div[2]/a[1]")
 
     def load(self):
@@ -34,14 +36,16 @@ class LoginPage:
 
     def click_submit(self):
         try:
+            # Wait for the submit button to be visible
             submit_element = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located(self.notification)
+                EC.visibility_of_element_located(self.submit)  # Use self.submit here
             )
             submit_element.click()
+            print("Submit button clicked.")
         except NoSuchElementException:
-            print("Notification element not found.")
+            print("Submit button element not found.")
         except TimeoutException:
-            print("Timed out waiting for notification element.")
+            print("Timed out waiting for submit button element.")
 
     def enter_user_email(self, useremail):
         email_field = self.driver.find_element(*self.user_email_input)
@@ -55,18 +59,6 @@ class LoginPage:
         login_button = self.driver.find_element(*self.login_button)
         login_button.click()
 
-
-    def click_submit(self):
-        try:
-            submit_element = WebDriverWait(self.driver, 10).until(
-                EC.visibility_of_element_located(self.notification)
-            )
-            submit_element.click()
-        except NoSuchElementException:
-            print("Notification element not found.")
-        except TimeoutException:
-            print("Timed out waiting for notification element.")
-
     def is_challenge_element_found_successful(self):
         try:
             dashboard_element = WebDriverWait(self.driver, 10).until(
@@ -79,17 +71,4 @@ class LoginPage:
             return False
         except TimeoutException:
             print("Timed out waiting for dashboard element.")
-            return False
-
-    def is_login_user_fine(self):
-        try:
-            dasboard_element = self.driver.find_element(*self.dashboard)
-            if dashboard_element.is_displayed():
-                print("text displayed.")
-                return True
-            else:
-                print("text is not displayed.")
-                return False
-        except NoSuchElementException:
-            print("element was not found.")
             return False

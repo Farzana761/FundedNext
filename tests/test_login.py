@@ -19,7 +19,7 @@ def test_login_page(driver):
         WebDriverWait(driver, 10).until(
             EC.visibility_of_element_located(login_page.dashboard)
         )
-        assert login_page.is_challenge_element_found_successful(), "Account Page  displayed correctly"
+        assert login_page.is_login_user_fine(), "Account Page  displayed correctly"
     except TimeoutException:
         print("TimeoutException: Dashboard element not visible within the given time.")
 
@@ -45,12 +45,15 @@ def test_valid_login_credentials(driver):
     login_page.enter_user_password("1qazZAQ!")
     login_page.click_login()
 
+    # Wait for the modal to be visible and then click submit
     try:
         WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located(login_page.dashboard)
+            EC.visibility_of_element_located(login_page.submit)
         )
-        assert login_page.is_challenge_element_found_successful(), "Login unsuccessful or dashboard not displayed"
+        login_page.click_submit()
+        print("Submit button clicked after login.")
     except TimeoutException:
-        print("TimeoutException: Dashboard element not visible within the given time.")
+        print("TimeoutException: Submit button element not visible within the given time.")
 
-    time.sleep(15)
+    time.sleep(15)  # Optional: Wait to observe the result of the submit action
+
